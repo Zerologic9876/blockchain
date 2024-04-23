@@ -1,0 +1,112 @@
+Prac 5 
+q1 set and get message
+
+pragma solidity ^0.5.17;
+
+contract Message{
+    string message;
+
+    constructor(string memory newMessage) public {
+        message = newMessage;
+    }
+    function setMessage(string memory newMessage) public {
+        message = newMessage;
+    }
+    function getMessage() public view returns(string memory){
+        return message;
+    }
+}
+
+q2 calculate Factorial
+
+pragma solidity ^0.5.17;
+
+contract Factorial {
+    function calculateFactorial(uint256 n) external pure returns (uint256) {
+        if (n == 0 || n == 1) {
+            return 1;
+        } else {
+            uint256 result = 1;
+            for (uint256 i = 2; i <= n; i++) {
+                result *= i;
+            }
+            return result;
+        }
+    }
+}
+
+q3 calculate Perfect Number
+
+pragma solidity ^0.5.17;
+
+contract PerfectNumber {
+    function isPerfectNumber(uint256 n) external pure returns (bool) {
+        require(n > 1, "Input must be greater than 1");
+        uint256 sum = 1; // Start with 1 as all numbers are divisible by 1
+        for (uint256 i = 2; i * i <= n; i++) {
+            if (n % i == 0) {
+                sum += i;
+                if (i != n / i) {
+                    sum += n / i;
+                }
+            }
+        }
+        return sum == n;
+    }
+}
+
+q 4 Armstrong Number 
+
+pragma solidity ^0.5.17;
+
+contract ArmstrongNumber {
+    function isArmstrongNumber(uint256 number) external pure returns (bool) {
+        uint256 originalNumber = number;
+        uint256 numDigits = 0;
+        uint256 sum = 0;
+        
+        // Count the number of digits in the number
+        while (number != 0) {
+            numDigits++;
+            number /= 10;
+        }
+        
+        // Reset number to original value
+        number = originalNumber;
+        
+        // Calculate sum of nth power of each digit
+        while (number != 0) {
+            uint256 digit = number % 10;
+            sum += power(digit, numDigits);
+            number /= 10;
+        }
+        
+        
+        return sum == originalNumber;
+    }
+    
+    // Function to calculate the nth power of a number
+    function power(uint256 base, uint256 exponent) internal pure returns (uint256 result) {
+        result = 1;
+        for (uint256 i = 0; i < exponent; i++) {
+            result *= base;
+        }
+    }
+}
+
+q5 sum of digit
+pragma solidity ^0.5.17;
+
+contract SumOfDigits {
+    function calculateSumOfDigits(uint256 number) public pure returns (uint256) {
+        uint256 sum = 0;
+        
+        // Iterate through each digit and add it to the sum
+        while (number > 0) {
+            sum += number % 10;
+            number /= 10;
+        }
+        
+        return sum;
+    }
+}

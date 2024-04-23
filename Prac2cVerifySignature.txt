@@ -1,0 +1,56 @@
+from Crypto.PublicKey import RSA
+from Crypto.Signature import PKCS1_v1_5
+from Crypto.Hash import SHA256
+import binascii
+
+def generate_key_pair():
+    # Generate an RSA key pair
+    key = RSA.generate(2048)
+    # Get the private key
+    private_key = key.export_key('PEM')
+    # Get the public key
+    public_key = key.publickey().export_key('PEM')
+    return public_key, private_key
+
+def sign_message(message, private_key):
+    # Load the private key
+    rsa_key = RSA.import_key(private_key)
+    # Compute the hash of the message
+    hash_obj = SHA256.new(message.encode())
+    # Create a signature
+    signer = PKCS1_v1_5.new(rsa_key)
+    signature = signer.sign(hash_obj)
+    # Return the signature
+    return binascii.hexlify(signature).decode('ascii')
+
+def verify_signature(message, signature, public_key):
+    # Load the public key
+    rsa_key = RSA.import_key(public_key)
+    # Compute the hash of the message
+    hash_obj = SHA256.new(message.encode())
+    # Verify the signature
+    verifier = PKCS1_v1_5.new(rsa_key)
+    return verifier.verify(hash_obj, binascii.unhexlify(signature))
+
+def main():
+    # Generate key pair
+    public_key, private_key = generate_key_pair()
+    print("Public Key:\n", public_key)
+    print("\nPrivate Key:\n", private_key)
+
+    # Message to be signed
+    message = "Hello, world!"
+
+    # Sign the message
+    signature = sign_message(message, private_key)
+    print("\nDigital Signature:\n", signature)
+
+    # Verify the signature
+    verified = verify_signature(message, signature, public_key)
+    if verified:
+        print("\nSignature is valid. Identity verified.")
+    else:
+        print("\nSignature is invalid. Identity cannot be verified.")
+
+if __name__ == "__main__":
+    main()

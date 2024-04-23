@@ -1,0 +1,431 @@
+Prac6 Solidity2
+
+Q1 mapping
+
+pragma solidity >0.4.22 <0.6.0;
+
+contract abc {
+    mapping(uint => string) details;
+
+    function updateDetails(uint id, string memory name) public {
+        details[id] = name;
+    }
+
+    function getDetails(uint id) public view returns (string memory) {
+        return details[id];
+    }
+}
+ Q2 Modifier
+
+// Solidity program to demonstrate 
+// modifier with argument 
+//SPDX-License-Identifier:GPL-3.0 
+pragma solidity >=0.4.22 <0.7.0; 
+contract modifierWithoutArg { 
+address admin; 
+struct employee 
+{ 
+	uint emp_id; 
+	string emp_name; 
+	uint age; 
+} 
+	
+constructor() public
+{ 
+	admin = msg.sender; 
+} 
+	
+	modifier isAdmin 
+	{ 
+		require(admin == msg.sender); 
+		_; 
+	} 
+employee e; 
+function enterDetails (uint _empid, string memory _empname, 
+						uint _empage) public isAdmin { 
+e.emp_id = _empid; 
+e.emp_name = _empname; 
+e.age = _empage; 
+} 
+} 
+
+Q3 Array
+
+pragma solidity >0.4.22 <0.6.0;
+
+contract testArray {
+    uint[] myArray;
+    uint[4] arr = [6, 8, 5, 8];
+
+    function Test(uint x) public {
+        myArray.push(x);
+    }
+
+    function fixedTest(uint) public view returns(uint[4] memory) {
+        return arr;
+    }
+
+    function getArray() public view returns(uint[] memory) {
+        return myArray;
+    }
+
+    function getLength() public view returns(uint) {
+        return myArray.length;
+    }
+}
+
+q4 structure(Bank problem)
+
+pragma solidity >0.4.22 <0.6.0;
+
+// Define a contract named Bank
+contract Bank {
+    uint256 private value; // Private variable to store balance
+    address public owner; // Public variable to store owner's address
+
+    // Constructor to initialize owner and deposit initial amount
+    constructor(uint256 amount) public {
+        owner = msg.sender; // Set owner to the address deploying the contract
+        value = amount; // Initialize balance with the provided amount
+    }
+
+    // Modifier to restrict access to functions only to the owner
+    modifier ownerfunc {
+        require(owner == msg.sender, "Only owner can call this function");
+        _; // Continue execution if the condition is met
+    }
+
+    // Internal function to check if withdrawal amount is less than or equal to balance
+    function check(uint256 amount) internal view returns (bool) {
+        return value >= amount;
+    }
+
+    // Function to deposit funds into the contract
+    function deposit(uint256 amount) public {
+        value += amount; // Add the deposited amount to the balance
+    }
+
+    // Function to check the balance of the contract
+    function checkBalance() public view ownerfunc returns (uint256) {
+        return value; // Return the balance
+    }
+
+    // Function to withdraw funds from the contract
+    function withdraw(uint256 amount) public ownerfunc {
+        if (check(amount)) { // Check if withdrawal amount is less than or equal to balance
+            value -= amount; // Subtract the withdrawal amount from the balance
+        }
+    }
+
+    // Function to check if the contract is eligible for a loan
+    function loan() public view returns (bool) {
+        return value >= 100000; // Return true if balance is greater than or equal to 100000
+    }
+}
+
+// Define a contract named myContract that inherits from Bank
+contract myContract is Bank(0) {
+    string name; // Variable to store name
+    uint age; // Variable to store age
+
+    // Function to set the name (restricted to owner)
+    function setName(string memory newName) public ownerfunc {
+        name = newName; // Set the name to the provided value
+    }
+
+    // Function to set the age (restricted to owner)
+    function setAge(uint newAge) public ownerfunc {
+        age = newAge; // Set the age to the provided value
+    }
+
+    // Function to get the name
+    function getName() public view returns (string memory) {
+        return name; // Return the name
+    }
+
+    // Function to get the age
+    function getAge() public view returns (uint) {
+        return age; // Return the age
+    }
+}
+
+Q5 library
+pragma solidity >0.4.22 <0.6.0;
+
+// Import the library 'xyz' from "demo3_library.sol"
+library xyz {
+    // Function to increment a value by 1
+    function increment(uint val) public pure returns (uint) {
+        return val + 1;
+    }
+
+    // Function to decrement a value by 1
+    function decrement(uint val) public pure returns (uint) {
+        return val - 1;
+    }
+
+    // Function to increment a value by a specified amount
+    function incrementbyValue(uint val, uint x) public pure returns (uint) {
+        return val + x;
+    }
+
+    // Function to decrement a value by a specified amount
+    function decrementbyValue(uint val, uint x) public pure returns (uint) {
+        return val - x;
+    }
+}
+
+// Define a contract named 'testLib'
+contract testLib {
+    // Use the library 'xyz' for 'uint' type
+    using xyz for uint;
+
+    // Function to test the increment function of the library
+    function testincrement(uint uservalue) public pure returns (uint) {
+        return xyz.increment(uservalue);
+    }
+
+    // Function to test the decrement function of the library
+    function testdectrement(uint uservalue) public pure returns (uint) {
+        return xyz.decrement(uservalue);
+    }
+
+    // Function to test the incrementbyValue function of the library
+    function valueIncrement(uint x, uint y) public pure returns (uint) {
+        return xyz.incrementbyValue(x, y);
+    }
+
+    // Function to test the decrementbyValue function of the library
+    function valueDecrement(uint x, uint y) public pure returns (uint) {
+        return xyz.decrementbyValue(x, y);
+    }
+}
+
+q6 Error handling by require revert and assert (CURD)
+pragma solidity >0.4.22 <0.6.0;
+
+contract CRUD {
+
+    struct User {
+        uint id;
+        string name;
+        string email;
+    }
+
+    User[] public users;
+    uint public nextId;
+
+    function create(string memory name, string memory email) public {
+        users.push(User(nextId, name, email));
+        nextId++;
+    }
+
+    function read(uint id) public view returns (uint, string memory, string memory) {
+        uint i = find(id);
+        return (users[i].id, users[i].name, users[i].email);
+    }
+
+    function update(uint id, string memory name, string memory email) public {
+        uint i = find(id);
+        users[i].name = name;
+        users[i].email = email;
+    }
+
+    function destroy(uint id) public {
+        uint i = find(id);
+        delete users[i];
+    }
+
+    function find(uint id) internal view returns (uint) {
+        for (uint i = 0; i < users.length; i++) {
+            if (users[i].id == id) {
+                return i;
+            }
+        }
+        revert("User is not existing");
+    }
+}
+
+q7)Inheritance(single,multiple,multilevel)
+single 
+pragma solidity >0.4.0 <0.6.0;
+
+contract Contract_A {
+    uint256 value;
+
+    constructor(uint256 n) public {
+        value = n;
+    }
+
+    function incrementValue(uint256 x) public {
+        value += x;
+    }
+}
+
+contract Contract_B is Contract_A(22) {
+    function getValue() public view returns (uint256) {
+        return value;
+    }
+}
+
+2)Multiple
+pragma solidity >0.4.0 <0.6.0;
+
+contract Contract_A {
+    uint256 value;
+
+    constructor(uint256 n) public {
+        value = n;
+    }
+
+    function incrementValue(uint256 x) public {
+        value += x;
+    }
+}
+
+contract Contract_B is Contract_A {
+    function decrementValue(uint256 x) public {
+        value -= x;
+    }
+}
+
+contract Contract_C is Contract_A(25), Contract_B {
+    function getValue() public view returns(uint256) {
+        return value;
+    }
+}
+
+3)multilevel
+pragma solidity >0.4.0 <0.6.0;
+
+contract Contract_A {
+    uint256 value;
+
+    constructor(uint256 n) public {
+        value = n;
+    }
+
+    function incrementValue(uint256 x) public {
+        value += x;
+    }
+}
+
+contract Contract_B is Contract_A(22) {
+    function decrementValue(uint256 x) public {
+        value -= x;
+    }
+}
+
+contract Contract_C is Contract_B {
+    function getValue() public view returns(uint256) {
+        return value;
+    }
+}
+
+Q8)View, pure, internal, external
+view code 
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract SimpleStorage {
+    uint256 private _value;
+
+    function setValue(uint256 newValue) public {
+        _value = newValue;
+    }
+
+    function getValue() public view returns (uint256) {
+        return _value;
+    }
+}
+// pure Code
+
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.8.0;
+
+contract MathOperations {
+    function multiply(uint256 a, uint256 b) public pure returns (uint256) {
+        return a * b;
+    }
+
+    function power(uint256 base, uint256 exponent) public pure returns (uint256) {
+        return _power(base, exponent);
+    }
+
+    function _power(uint256 base, uint256 exponent) internal pure returns (uint256) {
+        uint256 result = 1;
+        for (uint256 i = 0; i < exponent; i++) {
+            result *= base;
+        }
+        return result;
+    }
+}
+
+//Internal
+pragma solidity ^0.5.0;
+
+contract ContractBase {
+    // Private state variable
+    uint private data;
+
+    // Constructor
+    constructor() public {
+        data = 80;
+    }
+
+    // Internal function
+    function multiply(uint num1, uint num2) internal pure returns (uint) {
+        return num1 * num2;
+    }
+}
+
+// Inherited Contract
+contract ContractDerived is ContractBase {
+    uint private result;
+
+    constructor() public {
+        result = 0;
+    }
+
+    function getResult() public returns(uint) {
+        result = multiply(55, 7);
+        return result;
+    }
+}
+
+
+//External
+
+pragma solidity ^0.5.0;
+
+contract ContractOne {
+    // Private state variable
+    uint private data;
+
+    // Constructor
+    constructor() public {
+        data = 70;
+    }
+
+    // Public function
+    function multiply(uint num1, uint num2) public pure returns (uint) {
+        return num1 * num2;
+    }
+}
+
+// External Contract
+contract ExternalContract {
+    uint private result;
+    ContractOne private obj;
+
+    constructor() public {
+        obj = new ContractOne();
+    }
+
+    function getResult() public returns(uint) {
+        result = obj.multiply(70, 86);
+        return result;
+    }
+}
+
